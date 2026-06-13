@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Plato {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  category    String?
+  available   Boolean @default(true)
+}
+
+model Mesa {
+  number Int    @id
+  status String @default("libre")
+}
+
+model Pedido {
+  id          String       @id @default(uuid())
+  tableNumber Int
+  total       Float
+  status      String       @default("pendiente")
+  date        BigInt
+  horaCierre  BigInt?
+  items       PedidoItem[]
+}
+
+model PedidoItem {
+  id       String @id @default(uuid())
+  pedidoId String
+  name     String
+  quantity Int
+  price    Float
+  pedido   Pedido @relation(fields: [pedidoId], references: [id])
+}
+
+model Config {
+  key   String @id
+  value String
+}

@@ -1,0 +1,6 @@
+allowBuilds:
+  '@firebase/util': false
+  better-sqlite3: false
+  protobufjs: false
+  sharp: false
+  unrs-resolver: false

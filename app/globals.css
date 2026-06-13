@@ -1,26 +1,630 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@400;600&display=swap");
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ================================================================
+   MESAYA — GLOBAL STYLES
+   Basado en el prototipo Stitch aprobado
+   
+   ESTRUCTURA:
+   1. CSS Variables (tokens de diseño)
+   2. Reset base
+   3. Components (clases reutilizables)
+   4. Animaciones
+   ================================================================ */
+
+/* ================================================================
+   1. CSS VARIABLES — DESIGN TOKENS
+   ================================================================
+   
+   CÓMO USARLAS EN JSX:
+   ─────────────────────
+   Opción A: Tailwind class   → className="bg-surface text-on-surface"
+   Opción B: CSS var inline   → style={{ background: 'var(--mesa-surface)' }}
+   Opción C: clase custom     → className="glass-card"
+   
+   REGLA:
+   ─────
+   ✅ Usa --mesa-* para colores que cambian con el tema
+   ✅ El terracota (primary) NUNCA cambia entre temas
+   ❌ Nunca hardcodees #fff8f6 o #1a1a1a — usa las variables
+   ================================================================ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fondos */
+  --color-background: var(--mesa-background);
+  --color-surface: var(--mesa-surface);
+  --color-surface-container-lowest: var(--mesa-surface-container-lowest);
+  --color-surface-container-low: var(--mesa-surface-container-low);
+  --color-surface-container: var(--mesa-surface-container);
+  --color-surface-container-high: var(--mesa-surface-container-high);
+  --color-surface-container-highest: var(--mesa-surface-container-highest);
+  --color-surface-dim: var(--mesa-surface-dim);
+  --color-surface-variant: var(--mesa-surface-variant);
+  --color-surface-bright: var(--mesa-surface-bright);
+
+  /* Texto */
+  --color-on-surface: var(--mesa-on-surface);
+  --color-on-background: var(--mesa-on-background);
+  --color-on-surface-variant: var(--mesa-on-surface-variant);
+  --color-inverse-surface: var(--mesa-inverse-surface);
+  --color-inverse-on-surface: var(--mesa-inverse-on-surface);
+
+  /* Brand terracota — IGUAL EN LIGHT Y DARK, NUNCA CAMBIA */
+  --color-primary: var(--mesa-primary);
+  --color-primary-container: var(--mesa-primary-container);
+  --color-on-primary: var(--mesa-on-primary);
+  --color-on-primary-container: var(--mesa-on-primary-container);
+  --color-primary-fixed: var(--mesa-primary-fixed);
+  --color-primary-fixed-dim: var(--mesa-primary-fixed-dim);
+  --color-on-primary-fixed: var(--mesa-on-primary-fixed);
+  --color-inverse-primary: var(--mesa-inverse-primary);
+  --color-surface-tint: var(--mesa-surface-tint);
+
+  /* Secundario (naranja cálido) */
+  --color-secondary: var(--mesa-secondary);
+  --color-on-secondary: var(--mesa-on-secondary);
+  --color-secondary-container: var(--mesa-secondary-container);
+  --color-on-secondary-container: var(--mesa-on-secondary-container);
+
+  /* Terciario (verde éxito) — estados "Listo" */
+  --color-tertiary: var(--mesa-tertiary);
+  --color-on-tertiary: var(--mesa-on-tertiary);
+  --color-tertiary-container: var(--mesa-tertiary-container);
+  --color-on-tertiary-container: var(--mesa-on-tertiary-container);
+  --color-tertiary-fixed: var(--mesa-tertiary-fixed);
+  --color-on-tertiary-fixed: var(--mesa-on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--mesa-on-tertiary-fixed-variant);
+
+  /* Error */
+  --color-error: var(--mesa-error);
+  --color-on-error: var(--mesa-on-error);
+  --color-error-container: var(--mesa-error-container);
+  --color-on-error-container: var(--mesa-on-error-container);
+
+  /* Bordes */
+  --color-outline: var(--mesa-outline);
+  --color-outline-variant: var(--mesa-outline-variant);
+
+  /* Tipografía */
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Montserrat", sans-serif;
+
+  /* Escala tipográfica */
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-lg--font-weight: 700;
+
+  --text-headline-md: 20px;
+  --text-headline-md--line-height: 1.3;
+  --text-headline-md--font-weight: 600;
+
+  --text-price-display: 20px;
+  --text-price-display--line-height: 1;
+  --text-price-display--font-weight: 700;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--font-weight: 400;
+
+  --text-label-bold: 14px;
+  --text-label-bold--line-height: 1.2;
+  --text-label-bold--font-weight: 600;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-base: 8px;
+  --spacing-sm: 12px;
+  --spacing-gutter: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 40px;
+  --spacing-container-margin: 20px;
+
+  /* Animaciones */
+  --animate-pulse-soft: pulse-soft 2s ease infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ================================================================
+   LIGHT THEME — "El Salón"
+   Fondo crema cálido, terracota como acento de marca
+   ================================================================ */
+@layer base {
+  :root,
+  .light {
+    /* ── FONDOS ──────────────────────────────────────────────────
+       background / surface    → <body>, layout principal
+       surface-container-lowest → modales, dropdowns
+       surface-container-low   → sidebar, secciones elevadas
+       surface-container       → card headers, inputs
+       surface-container-high  → hover de items, elevated
+       surface-container-highest → tracks de barras de progreso
+       surface-dim             → disabled, placeholders
+       ──────────────────────────────────────────────────────────── */
+    --mesa-background: #fff8f6;
+    --mesa-surface: #fff8f6;
+    --mesa-surface-container-lowest: #ffffff;
+    --mesa-surface-container-low: #fff1ec;
+    --mesa-surface-container: #ffeae2;
+    --mesa-surface-container-high: #f9e4dc;
+    --mesa-surface-container-highest: #f3ded7;
+    --mesa-surface-dim: #ead6ce;
+    --mesa-surface-variant: #f3ded7;
+    --mesa-surface-bright: #fff8f6;
+
+    /* ── TEXTO ───────────────────────────────────────────────────
+       on-surface              → h1, h2, body text principal
+       on-surface-variant      → labels, metadata, subtítulos
+       inverse-surface         → fondos invertidos (tooltips dark)
+       inverse-on-surface      → texto claro sobre fondos invertidos
+       ──────────────────────────────────────────────────────────── */
+    --mesa-on-surface: #241915;
+    --mesa-on-background: #241915;
+    --mesa-on-surface-variant: #57423a;
+    --mesa-inverse-surface: #3a2e29;
+    --mesa-inverse-on-surface: #ffede7;
+
+    /* ── BRAND TERRACOTA — IGUAL EN LIGHT Y DARK, NUNCA CAMBIA ──
+       primary                 → texto de precios, botones principales,
+                                 borders activos, accents
+       primary-container       → hover del botón primary, badge total
+       on-primary              → texto blanco sobre botón terracota
+       surface-tint            → sombra: shadow-[4px_4px_0px_#c05621]
+       ──────────────────────────────────────────────────────────── */
+    --mesa-primary: #9f3e07;
+    --mesa-primary-container: #c05621;
+    --mesa-on-primary: #ffffff;
+    --mesa-on-primary-container: #fffeff;
+    --mesa-surface-tint: #c05621;
+    --mesa-primary-fixed: #ffdbcd;
+    --mesa-primary-fixed-dim: #ffb596;
+    --mesa-on-primary-fixed: #360f00;
+    --mesa-inverse-primary: #ffb596;
+
+    /* ── SECUNDARIO (naranja) ────────────────────────────────────
+       secondary               → badges "Pendiente", estados de espera
+       secondary-container     → fondo badge naranja, pill Pendiente
+       on-secondary-container  → texto sobre badge naranja
+       ──────────────────────────────────────────────────────────── */
+    --mesa-secondary: #9d4400;
+    --mesa-on-secondary: #ffffff;
+    --mesa-secondary-container: #fe8439;
+    --mesa-on-secondary-container: #662900;
+
+    /* ── TERCIARIO (verde) ───────────────────────────────────────
+       tertiary                → badge "Listo", botón Entregado,
+                                 borders de mesa lista, texto precio listo
+       tertiary-container      → fondo header de mesa lista
+       tertiary-fixed          → fondo header mesa lista (claro)
+       on-tertiary-fixed-variant → texto sobre tertiary-fixed
+       ──────────────────────────────────────────────────────────── */
+    --mesa-tertiary: #006c3f;
+    --mesa-on-tertiary: #ffffff;
+    --mesa-tertiary-container: #128752;
+    --mesa-on-tertiary-container: #ffffff;
+    --mesa-tertiary-fixed: #91f8b8;
+    --mesa-on-tertiary-fixed: #002110;
+    --mesa-on-tertiary-fixed-variant: #00522f;
+
+    /* ── ERROR ───────────────────────────────────────────────────
+       Validaciones de formularios, alertas críticas
+       ──────────────────────────────────────────────────────────── */
+    --mesa-error: #ba1a1a;
+    --mesa-on-error: #ffffff;
+    --mesa-error-container: #ffdad6;
+    --mesa-on-error-container: #93000a;
+
+    /* ── BORDES ──────────────────────────────────────────────────
+       outline                 → borders de cards, inputs, botones
+       outline-variant         → header border-bottom, divisores sutiles
+       ──────────────────────────────────────────────────────────── */
+    --mesa-outline: #8a7268;
+    --mesa-outline-variant: #dec0b5;
+
+    /* ── NAVBAR ──────────────────────────────────────────────────
+       No está en @theme, se usa con style inline o clase .navbar
+       ──────────────────────────────────────────────────────────── */
+    --mesa-navbar-bg: rgba(255, 248, 246, 0.85);
+  }
+
+  /* ================================================================
+     DARK THEME — "La Cocina"
+     Solo se cambian las variables que realmente difieren.
+     El terracota NUNCA cambia entre temas.
+     ================================================================ */
+  .dark {
+    /* Fondos dark */
+    --mesa-background: #1a1209;
+    --mesa-surface: #1a1209;
+    --mesa-surface-container-lowest: #1e1710;
+    --mesa-surface-container-low: #221c13;
+    --mesa-surface-container: #282016;
+    --mesa-surface-container-high: #2e261b;
+    --mesa-surface-container-highest: #342c20;
+    --mesa-surface-dim: #130e06;
+    --mesa-surface-variant: #2e261b;
+    --mesa-surface-bright: #fff8f6;
+
+    /* Texto dark */
+    --mesa-on-surface: #f5e9e3;
+    --mesa-on-background: #f5e9e3;
+    --mesa-on-surface-variant: #d4b8b0;
+    --mesa-inverse-surface: #3a2e29;
+    --mesa-inverse-on-surface: #ffede7;
+
+    /* Terracota — IDÉNTICO, no cambia */
+    --mesa-primary: #9f3e07;
+    --mesa-primary-container: #c05621;
+    --mesa-on-primary: #ffffff;
+    --mesa-on-primary-container: #fffeff;
+    --mesa-surface-tint: #c05621;
+
+    /* Naranja dark */
+    --mesa-secondary: #ffb68f;
+    --mesa-on-secondary: #4e1e00;
+    --mesa-secondary-container: #7a3300;
+    --mesa-on-secondary-container: #ffdbca;
+
+    /* Verde dark */
+    --mesa-tertiary: #74db9d;
+    --mesa-on-tertiary: #003920;
+    --mesa-tertiary-container: #005230;
+    --mesa-on-tertiary-container: #91f8b8;
+    --mesa-tertiary-fixed: #91f8b8;
+    --mesa-on-tertiary-fixed: #002110;
+    --mesa-on-tertiary-fixed-variant: #00522f;
+
+    /* Bordes dark — más sutiles */
+    --mesa-outline: #9e7b71;
+    --mesa-outline-variant: #4a3028;
+
+    --mesa-navbar-bg: rgba(26, 18, 9, 0.85);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ================================================================
+   2. RESET BASE
+   ================================================================ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--mesa-background);
+    color: var(--mesa-on-surface);
+    font-family: "Inter", sans-serif;
+    overflow-x: hidden;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  ::selection {
+    background-color: var(--mesa-primary);
+    color: var(--mesa-on-primary);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--mesa-primary);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--mesa-background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--mesa-outline-variant);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--mesa-primary);
+  }
+}
+
+/* ================================================================
+   3. COMPONENTS
+   ================================================================ */
+
+@layer components {
+  /* ── Contenedor ──────────────────────────────────────────────── */
+  .container-main {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+
+  /* ── Navbar ──────────────────────────────────────────────────── */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 20px;
+    background-color: var(--mesa-navbar-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--mesa-outline-variant);
+    box-shadow: 0px 4px 20px rgba(192, 86, 33, 0.08);
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  /* ── Glass card ──────────────────────────────────────────────── */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* ── Table card — base ───────────────────────────────────────── */
+  .table-card {
+    background-color: var(--mesa-surface);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .table-card:hover {
+    transform: scale(1.02);
+  }
+
+  /* ── Estados de mesa ─────────────────────────────────────────── */
+
+  /* Pendiente — borde naranja */
+  .table-card-pending {
+    border: 2px solid var(--mesa-secondary-container);
+    box-shadow: 0px 4px 20px rgba(192, 86, 33, 0.08);
+  }
+
+  /* Listo — borde verde */
+  .table-card-ready {
+    border: 2px solid var(--mesa-tertiary);
+    box-shadow: 0px 4px 20px rgba(0, 108, 63, 0.1);
+  }
+
+  /* Libre — sin borde activo */
+  .table-card-free {
+    border: 1px solid var(--mesa-outline-variant);
+    background-color: var(--mesa-surface-container-low);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+  .table-card-free:hover {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── Botones ─────────────────────────────────────────────────── */
+
+  /* Botón primario terracota */
+  .btn-primary {
+    background-color: var(--mesa-primary);
+    color: var(--mesa-on-primary);
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 6px 8px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: none;
+    transition:
+      background-color 0.2s ease,
+      transform 0.1s ease;
+  }
+  .btn-primary:hover {
+    background-color: var(--mesa-primary-container);
+  }
+  .btn-primary:active {
+    transform: scale(0.95);
+  }
+
+  /* Botón ghost / muted */
+  .btn-ghost {
+    background-color: var(--mesa-surface-variant);
+    color: var(--mesa-on-surface-variant);
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 6px 8px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: 1px solid var(--mesa-outline-variant);
+    transition:
+      background-color 0.2s ease,
+      transform 0.1s ease;
+  }
+  .btn-ghost:hover {
+    background-color: var(--mesa-surface-container-high);
+  }
+  .btn-ghost:active {
+    transform: scale(0.95);
+  }
+
+  /* Botón verde entregado */
+  .btn-success {
+    background-color: var(--mesa-tertiary);
+    color: var(--mesa-on-tertiary);
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 12px 8px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background-color 0.2s ease;
+  }
+  .btn-success:hover {
+    background-color: var(--mesa-tertiary-container);
+  }
+
+  /* ── Badge de estado ─────────────────────────────────────────── */
+  .badge-pending {
+    background-color: #fed7aa; /* orange-200 — no cambia con tema */
+    color: var(--mesa-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 9999px;
+  }
+
+  .badge-ready {
+    background-color: var(--mesa-tertiary);
+    color: var(--mesa-on-tertiary);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    animation: pulse-soft 2s ease infinite;
+  }
+
+  /* ── Sidebar nav link ────────────────────────────────────────── */
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    color: var(--mesa-on-surface-variant);
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .nav-link:hover {
+    background-color: var(--mesa-surface-container-highest);
+  }
+
+  .nav-link-active {
+    background-color: var(--mesa-secondary-container);
+    color: var(--mesa-on-secondary-container);
+  }
+
+  /* ── Material Symbols ────────────────────────────────────────── */
+  .material-symbols-outlined {
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+
+  /* ── No scrollbar ────────────────────────────────────────────── */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ================================================================
+   4. ANIMACIONES
+   ================================================================ */
+
+/* Pulse suave — badge "Listo" */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Fade up — entrada de elementos */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Shimmer — skeleton loading */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--mesa-surface-container) 25%,
+    var(--mesa-surface-container-high) 50%,
+    var(--mesa-surface-container) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Stagger delays */
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-400 {
+  animation-delay: 400ms;
 }
